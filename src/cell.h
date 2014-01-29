@@ -10,7 +10,7 @@ public:
     Cell();
     void nextState();
     void setElectron();
-    Globals::State getState();
+    const Globals::State getState()const;
 private:
     Globals::State m_sCellState;
 };

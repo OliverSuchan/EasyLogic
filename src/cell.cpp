@@ -22,6 +22,6 @@ void Cell::setElectron(){
     m_sCellState = Globals::CONDUCTOR;
 }
 
-Globals::State Cell::getState(){
+const Globals::State Cell::getState() const{
     return m_sCellState;
 }

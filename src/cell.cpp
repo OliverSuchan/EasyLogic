@@ -7,14 +7,9 @@ Cell::Cell() : m_sCellState(Globals::EMPTY)
 void Cell::nextState(){
     if(m_sCellState)
     {
-        try
-        {
-            m_sCellState = static_cast<Globals::State>(m_sCellState + 1);
-        }
-        catch(std::exception)
-        {
+        m_sCellState = static_cast<Globals::State>(m_sCellState + 1);
+        if(m_sCellState > 3)
             m_sCellState = Globals::CONDUCTOR;
-        }
     }
 }
 
@@ -24,4 +19,9 @@ void Cell::setElectron(){
 
 const Globals::State Cell::getState() const{
     return m_sCellState;
+}
+
+void Cell::setState(Globals::State p_sValue)
+{
+    m_sCellState = p_sValue;
 }

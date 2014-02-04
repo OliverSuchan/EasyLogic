@@ -5,9 +5,10 @@
 #include <QPainter>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QtMath>
 #include <iostream>
 #include "globals.h"
-#include "automaton.h"
+#include "wireworldwidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,12 +18,11 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-protected:
-    void paintEvent(QPaintEvent *);
-    bool eventFilter(QObject *obj, QEvent *event);
+ protected:
+    void resizeEvent(QResizeEvent *p_pqrEvent);
 
 private:
-    Automaton m_aAuto;
+    WireWorldWidget *m_pwwwWire;
     Globals::State m_sCurrentState;
 };
 

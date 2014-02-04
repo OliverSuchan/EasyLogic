@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui opengl widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,10 +16,12 @@ SOURCES +=\
     src/cell.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
-    src/automaton.cpp
+    src/automaton.cpp \
+    src/wireworldwidget.cpp
 
 HEADERS  += \
     src/mainwindow.h \
     src/cell.h \
     src/globals.h \
-    src/automaton.h
+    src/automaton.h \
+    src/wireworldwidget.h

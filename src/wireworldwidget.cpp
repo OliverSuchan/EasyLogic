@@ -12,6 +12,16 @@ void WireWorldWidget::setAutomaton(const Automaton &p_aAutomaton)
     this->repaint();
 }
 
+
+bool WireWorldWidget::getAuoNextGeneration() const
+{
+    return m_bAuoNextGeneration;
+}
+
+void WireWorldWidget::setAuoNextGeneration(bool p_bAuoNextGeneration)
+{
+    m_bAuoNextGeneration = p_bAuoNextGeneration;
+}
 void WireWorldWidget::paintEvent(QPaintEvent *p_pqpPaintEvent)
 {
     QPainter qpPainter(this);
@@ -35,7 +45,10 @@ void WireWorldWidget::keyPressEvent(QKeyEvent *p_pqkeEvent)
     else if(p_pqkeEvent->key() == Qt::Key_Return)
     {
         std::cout << "Current Generation: " << m_aAutomaton.nextGeneration() << std::endl;
-        this->repaint();
+    }
+    else if(p_pqkeEvent->key() == Qt::Key_Space)
+    {
+        this->setAuoNextGeneration(!this->getAuoNextGeneration());
     }
 }
 
@@ -54,7 +67,6 @@ void WireWorldWidget::mousePressEvent(QMouseEvent *p_qmeEvent)
             m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
         }
         catch(std::exception) {}
-        this->repaint();
     }
 }
 
@@ -71,11 +83,20 @@ void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
         m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
     }
     catch(std::exception) {}
+}
+
+void WireWorldWidget::update()
+{
     this->repaint();
+    if(m_bAuoNextGeneration)
+        m_aAutomaton.nextGeneration();
 }
 
 WireWorldWidget::WireWorldWidget(QWidget *p_pqwParent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), p_pqwParent)
+    : QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer), p_pqwParent)
 {
     setFocusPolicy(Qt::ClickFocus);
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(10);
 }

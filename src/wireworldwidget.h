@@ -7,7 +7,7 @@
 #include "globals.h"
 #include "automaton.h"
 
-class WireWorldWidget : public QGLWidget
+class WireWorldWidget : public QWidget
 {
     Q_OBJECT
 

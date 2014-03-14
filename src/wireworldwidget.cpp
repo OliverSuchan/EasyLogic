@@ -73,8 +73,8 @@ void WireWorldWidget::mousePressEvent(QMouseEvent *p_qmeEvent)
         double iY = p_qmeEvent->windowPos().y();
         double iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor_X;
         double iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor_Y;
-        int iCellNumberAbscissa = qRound(iX / iCellWidth);
-        int iCellNumberOrdinant = qRound(iY / iCellHeight);
+        int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
+        int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
         try
         {
             m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
@@ -89,8 +89,8 @@ void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
     double iY = p_qmeEvent->windowPos().y();
     double iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor_X;
     double iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor_Y;
-    int iCellNumberAbscissa = qRound(iX / iCellWidth);
-    int iCellNumberOrdinant = qRound(iY / iCellHeight);
+    int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
+    int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
     try
     {
         m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
@@ -106,7 +106,7 @@ void WireWorldWidget::update()
 }
 
 WireWorldWidget::WireWorldWidget(QWidget *p_pqwParent)
-    : QGLWidget(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer), p_pqwParent)
+    : QWidget(p_pqwParent)
 {
     setFocusPolicy(Qt::ClickFocus);
     QTimer *timer = new QTimer(this);

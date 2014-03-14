@@ -2,7 +2,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-{ 
+{
     m_sCurrentState = Globals::EMPTY;
     m_pwwwWire = new WireWorldWidget(this);
     m_pwwwWire->show();

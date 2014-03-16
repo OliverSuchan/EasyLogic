@@ -31,6 +31,7 @@ public:
     void setAutomaton(const Automaton &p_aAutomaton);
     bool getAuoNextGeneration() const;
     void setAuoNextGeneration(bool p_bAuoNextGeneration);
+    void resize(int p_iWidth, int p_iHeight);
 };
 
 #endif // WIREWORLDWIDGET_H

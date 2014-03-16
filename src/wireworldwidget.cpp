@@ -22,6 +22,17 @@ void WireWorldWidget::setAuoNextGeneration(bool p_bAuoNextGeneration)
 {
     m_bAuoNextGeneration = p_bAuoNextGeneration;
 }
+
+void WireWorldWidget::resize(int p_iWidth, int p_iHeight)
+{
+    QWidget::resize(p_iWidth, p_iHeight);
+    if(m_aAutomaton.getWidth() * Globals::CELL_WIDTH * Globals::ZoomFactor_X != p_iWidth)
+        Globals::CELL_WIDTH = p_iWidth / m_aAutomaton.getWidth() + 1;
+
+    if(m_aAutomaton.getHeight() * Globals::CELL_HEIGHT * Globals::ZoomFactor_Y != p_iHeight)
+        Globals::CELL_HEIGHT = p_iHeight / m_aAutomaton.getHeight() + 1;
+}
+
 void WireWorldWidget::paintEvent(QPaintEvent *p_pqpPaintEvent)
 {
     QPainter qpPainter(this);
@@ -97,6 +108,7 @@ void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
     }
     catch(std::exception) {}
 }
+
 
 void WireWorldWidget::update()
 {

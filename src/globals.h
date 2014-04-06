@@ -6,11 +6,10 @@
 namespace Globals
 {
 
-    static const int CELL_WIDTH = 32;
-    static const int CELL_HEIGHT = 32;
+    static qreal CELL_WIDTH = 32;
+    static qreal CELL_HEIGHT = 32;
     static qreal ZoomFactor_X = 1.0;
     static qreal ZoomFactor_Y = 1.0;
-
 
     enum State {
         EMPTY, CONDUCTOR, HEAD, TAIL

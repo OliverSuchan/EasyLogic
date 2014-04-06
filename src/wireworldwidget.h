@@ -6,6 +6,7 @@
 #include <QTimer>
 #include "globals.h"
 #include "automaton.h"
+#include "dataio.h"
 
 class WireWorldWidget : public QWidget
 {

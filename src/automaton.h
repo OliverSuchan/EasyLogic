@@ -22,8 +22,8 @@ public:
 
 private:
     bool checkCell(int p_iAbscissa, int p_iOrdinant);
-    CellArray m_caCells;
-    CellArray m_caAuxilliaryArray;
+public:    CellArray m_caCells;
+private:    CellArray m_caAuxilliaryArray;
     long m_lCurrentGen;
 };
 

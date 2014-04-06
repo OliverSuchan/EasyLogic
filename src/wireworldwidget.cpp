@@ -74,6 +74,14 @@ void WireWorldWidget::keyPressEvent(QKeyEvent *p_pqkeEvent)
         Globals::ZoomFactor_X -= 0.1;
         Globals::ZoomFactor_Y -= 0.1;
     }
+    else if(p_pqkeEvent->key() == Qt::Key_S)
+    {
+        DataIO::getInstance() << CellPattern(m_aAutomaton.m_caCells, std::string("guenther"));
+    }
+    else if(p_pqkeEvent->key() == Qt::Key_L)
+    {
+        m_aAutomaton.m_caCells = DataIO::getInstance().getPattern("guenther");
+    }
 }
 
 void WireWorldWidget::mousePressEvent(QMouseEvent *p_qmeEvent)

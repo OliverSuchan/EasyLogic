@@ -1,7 +1,8 @@
 #ifndef WIREWORLDWIDGET_H
 #define WIREWORLDWIDGET_H
 
-#include <QPaintEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
 #include <QGLWidget>
 #include <QTimer>
 #include <thread>
@@ -17,14 +18,13 @@ class WireWorldWidget : public QGLWidget
 private:
     Automaton m_aAutomaton;
     Globals::State m_sCurrentState;
-    bool m_bAutoNextGeneration;
-    std::thread m_sthrUpdateThread;
+    std::atomic<bool> m_bAutoNextGeneration;
+    std::thread *m_sthrUpdateThread;
     std::mutex m_threadMutex;
-    bool m_bCanUpdate;
+    std::atomic<bool> m_bCanUpdate;
     int m_iFPS;
 
 protected:
-    //void paintEvent(QPaintEvent *p_pqpPaintEvent);
     void keyPressEvent(QKeyEvent *p_pqkeEvent);
     void mousePressEvent(QMouseEvent *p_qmeEvent);
     void mouseMoveEvent(QMouseEvent *p_qmeEvent);

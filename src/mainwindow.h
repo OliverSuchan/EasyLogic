@@ -18,7 +18,7 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
- protected:
+protected:
     void resizeEvent(QResizeEvent *p_pqrEvent);
 
 private:

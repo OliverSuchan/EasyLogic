@@ -25,21 +25,27 @@ DataIO &DataIO::operator<<(const CellPattern &p_cpPattern)
         std::ofstream ofOut(PATH, std::ios_base::binary);
         std::ifstream ifIn(PATH, std::ios_base::binary);
         ifIn.seekg(0, ifIn.end);
-        if( ! ifIn.tellg()){
+        if(!ifIn.tellg()){
             ofOut.write(p_cpPattern.getName().c_str(), p_cpPattern.getName().size());
             ofOut.put('\n');
             long lIndexForNextPos = ofOut.tellp();
             ofOut.seekp(INDEX_SIZE, ofOut.cur);
-            for(auto aRows : p_cpPattern){
-                for(Cell cCell : aRows){
+            for(auto aRows : p_cpPattern)
+            {
+                for(Cell cCell : aRows)
+                {
                     ofOut.put(cCell.getState());
                 }
             }
             long lNextWritePos = ofOut.tellp();
             ofOut.seekp(lIndexForNextPos, ofOut.beg);
-            for(int i = 0; i < INDEX_SIZE; i++){
-                ofOut.put(static_cast<char>(lNextWritePos >> i*8));
-                }
+            for(int i = 0; i < INDEX_SIZE; i++)
+            {
+                lNextWritePos >>= 8;
+                ofOut.put(static_cast<char>(lNextWritePos));
+            }
+            ofOut.close();
+            ifIn.close();
             ifIn.seekg(0); //DEBUG
             while(!ifIn.eof())std::cout<<ifIn.get()<<std::endl;
         }

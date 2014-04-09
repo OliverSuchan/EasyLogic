@@ -3,10 +3,12 @@
 
 #include <fstream>
 #include <QRegExp>
+#include <QString>
+#include <QDebug>
 #include "cellpattern.h"
 #include "globals.h"
 
-#define PATH "C:/Users/Philipp/Documents/GitHub/build-EasyLogic-Desktop_Qt_5_1_1_MinGW_32bit-Debug/debug/test.txt"
+#define PATH "test.txt"
 #define INDEX_SIZE 8
 
 class DataIO

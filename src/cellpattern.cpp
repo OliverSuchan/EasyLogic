@@ -7,7 +7,7 @@ CellPattern::CellPattern(CellArray &p_caArray, const std::string &p_sName) : Cel
 
 const std::string &CellPattern::getName() const
 {
-    return m_sName.c_str();
+    return m_sName;
 }
 
 void CellPattern::setName(char *p_sName)

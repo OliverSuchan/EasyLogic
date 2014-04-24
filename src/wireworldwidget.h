@@ -11,7 +11,7 @@
 #include "globals.h"
 #include "automaton.h"
 
-class WireWorldWidget : public QGLWidget
+class WireWorldWidget : public QWidget
 {
     Q_OBJECT
 
@@ -28,9 +28,7 @@ protected:
     void keyPressEvent(QKeyEvent *p_pqkeEvent);
     void mousePressEvent(QMouseEvent *p_qmeEvent);
     void mouseMoveEvent(QMouseEvent *p_qmeEvent);
-    void initializeGL();
-    void resizeGL(int p_iWidth, int p_iHeight);
-    void paintGL();
+    void paintEvent(QPaintEvent *);
 
 private slots:
     void update();
@@ -44,9 +42,6 @@ public:
     bool getAutoNextGeneration() const;
     void setAutoNextGeneration(bool p_bAutoNextGeneration);
     void resize(int p_iWidth, int p_iHeight);
-
-    bool getAuoNextGeneration() const;
-    void setAuoNextGeneration(bool p_bAuoNextGeneration);
 };
 
 #endif // WIREWORLDWIDGET_H

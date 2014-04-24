@@ -26,10 +26,10 @@ void WireWorldWidget::setAutoNextGeneration(bool p_bAutoNextGeneration)
 void WireWorldWidget::resize(int p_iWidth, int p_iHeight)
 {
     QWidget::resize(p_iWidth, p_iHeight);
-    if(m_aAutomaton.getWidth() * Globals::CELL_WIDTH * Globals::ZoomFactor_X != p_iWidth)
+    if(m_aAutomaton.getWidth() * Globals::CELL_WIDTH * Globals::ZoomFactor != p_iWidth)
         Globals::CELL_WIDTH = p_iWidth / m_aAutomaton.getWidth() + 1;
 
-    if(m_aAutomaton.getHeight() * Globals::CELL_HEIGHT * Globals::ZoomFactor_Y != p_iHeight)
+    if(m_aAutomaton.getHeight() * Globals::CELL_HEIGHT * Globals::ZoomFactor != p_iHeight)
         Globals::CELL_HEIGHT = p_iHeight / m_aAutomaton.getHeight() + 1;
 }
 
@@ -50,13 +50,15 @@ void WireWorldWidget::keyPressEvent(QKeyEvent *p_pqkeEvent)
     }
     else if(p_pqkeEvent->key() == Qt::Key_Plus)
     {
-        Globals::ZoomFactor_X += 0.1;
-        Globals::ZoomFactor_Y += 0.1;
+        Globals::ZoomFactor += 0.1;
     }
     else if(p_pqkeEvent->key() == Qt::Key_Minus)
     {
-        Globals::ZoomFactor_X -= 0.1;
-        Globals::ZoomFactor_Y -= 0.1;
+        Globals::ZoomFactor -= 0.1;
+    }
+    else if(p_pqkeEvent->key() == Qt::Key_NumberSign)
+    {
+        Globals::ZoomFactor = 1;
     }
 }
 
@@ -66,8 +68,8 @@ void WireWorldWidget::mousePressEvent(QMouseEvent *p_qmeEvent)
     {
         double iX = p_qmeEvent->windowPos().x();
         double iY = p_qmeEvent->windowPos().y();
-        double iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor_X;
-        double iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor_Y;
+        double iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor;
+        double iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor;
         int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
         int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
         try
@@ -82,8 +84,8 @@ void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
 {
     double iX = p_qmeEvent->windowPos().x();
     double iY = p_qmeEvent->windowPos().y();
-    double iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor_X;
-    double iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor_Y;
+    double iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor;
+    double iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor;
     int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
     int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
     try
@@ -93,36 +95,14 @@ void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
     catch(std::exception) {}
 }
 
-void WireWorldWidget::initializeGL()
-{
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-}
-
-void WireWorldWidget::resizeGL(int p_iWidth, int p_iHeight)
-{   
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glViewport(0, 0, p_iWidth, p_iHeight);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glRotatef(180, 1.0f, 0, 0);
-    glTranslatef(-1.0f, -1.0f, 0);
-    glScalef(2.0f/p_iWidth, 2.0f/p_iHeight, 1);
-
-    glTranslatef(2.0f, 2.0f, 0);
-}
-
-void WireWorldWidget::paintGL()
+void WireWorldWidget::paintEvent(QPaintEvent *)
 {
     m_bCanUpdate.store(false);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glBegin(GL_QUADS);
-    qreal iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor_X;
-    qreal iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor_Y;
+    QPainter qpPainter(this);
+    qpPainter.setRenderHint(QPainter::HighQualityAntialiasing);
+    qpPainter.fillRect(0, 0, size().height(), size().width(), Globals::s_rqcColors[Globals::EMPTY]);
+    qreal iCellWidth = Globals::CELL_WIDTH * Globals::ZoomFactor;
+    qreal iCellHeight = Globals::CELL_HEIGHT * Globals::ZoomFactor;
     for(int iCounterX = 0; iCounterX < m_aAutomaton.getWidth(); iCounterX++)
     {
         for(int iCounterY = 0; iCounterY < m_aAutomaton.getHeight(); iCounterY++)
@@ -132,13 +112,7 @@ void WireWorldWidget::paintGL()
                 QColor color = Globals::s_rqcColors[m_aAutomaton.getStateAt(iCounterX, iCounterY)];
                 if(color == Qt::black)
                     continue;
-                int x1 = iCounterX * iCellWidth;
-                int y1 = iCounterY * iCellHeight;
-                glColor3f(color.redF(), color.greenF(), color.blueF());
-                glVertex2f(x1, y1);
-                glVertex2f(x1, y1 + iCellHeight);
-                glVertex2f(x1 + iCellWidth, y1 + iCellHeight);
-                glVertex2f(x1 + iCellWidth, y1);
+                qpPainter.fillRect(QRectF(iCounterX * iCellWidth, iCounterY * iCellHeight, iCellWidth, iCellHeight), color);
             }
         }
     }
@@ -153,7 +127,7 @@ void WireWorldWidget::update()
         m_threadMutex.lock();
         if(m_bAutoNextGeneration)
             m_aAutomaton.nextGeneration();
-        QMetaObject::invokeMethod(this, "updateGL", Qt::QueuedConnection);
+        QMetaObject::invokeMethod(this, "repaint", Qt::QueuedConnection);
         while(!m_bCanUpdate.load()) {}
         m_iFPS++;
         m_threadMutex.unlock();
@@ -170,7 +144,7 @@ void WireWorldWidget::framesPerSecond()
 }
 
 WireWorldWidget::WireWorldWidget(QWidget *p_pqwParent)
-    : QGLWidget(p_pqwParent)
+    : QWidget(p_pqwParent)
 {
     setFocusPolicy(Qt::ClickFocus);
     m_bAutoNextGeneration.store(false);

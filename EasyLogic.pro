@@ -18,11 +18,14 @@ SOURCES +=\
     src/main.cpp \
     src/mainwindow.cpp \
     src/automaton.cpp \
-    src/wireworldwidget.cpp
+    src/wireworldwidget.cpp \
+    src/mapsettingswindow.cpp \
+    src/globals.cpp
 
 HEADERS  += \
     src/mainwindow.h \
     src/cell.h \
     src/globals.h \
     src/automaton.h \
-    src/wireworldwidget.h
+    src/wireworldwidget.h \
+    src/mapsettingswindow.h

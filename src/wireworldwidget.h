@@ -22,7 +22,7 @@ private:
     std::thread *m_sthrUpdateThread;
     std::mutex m_threadMutex;
     std::atomic<bool> m_bCanUpdate;
-    int m_iFPS;
+    std::atomic<int> m_iFPS;
 
 protected:
     void keyPressEvent(QKeyEvent *p_pqkeEvent);
@@ -42,6 +42,8 @@ public:
     bool getAutoNextGeneration() const;
     void setAutoNextGeneration(bool p_bAutoNextGeneration);
     void resize(int p_iWidth, int p_iHeight);
+    static QColor s_rqcColors[];
+
 };
 
 #endif // WIREWORLDWIDGET_H

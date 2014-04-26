@@ -16,7 +16,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *p_qwParent = 0);
+    MainWindow(int p_iHeight, int p_iWidth, QWidget *p_qwParent = 0);
     ~MainWindow();
 
 protected:

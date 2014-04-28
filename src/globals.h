@@ -11,12 +11,15 @@ public:
     };
 
     static Globals &getInstance();
-    qreal CELL_WIDTH;
-    qreal CELL_HEIGHT;
-    qreal ZoomFactor;
+    int m_dCellWidth;
+    int m_dCellHeight;
+    int m_iX;
+    int m_iY;
+    double m_dZoomFactor;
 
     QString m_rqstStateNames[4];
     QColor m_rqcColors[4];
+
 
 private:
     Globals();

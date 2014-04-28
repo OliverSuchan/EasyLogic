@@ -16,8 +16,9 @@ Globals::Globals()
     m_rqstStateNames[1] = "Leiter";
     m_rqstStateNames[2] = "Elektronen-Kopf";
     m_rqstStateNames[3] = "Elektronen-Ende";
-    CELL_HEIGHT = CELL_WIDTH = 32;
-    ZoomFactor = 1;
+    m_dCellHeight = m_dCellWidth = 32;
+    m_iX = m_iY = 0;
+    m_dZoomFactor = 1;
 }
 
 Globals::Globals(Globals &p_gloRef)

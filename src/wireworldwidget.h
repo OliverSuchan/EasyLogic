@@ -1,9 +1,11 @@
 #ifndef WIREWORLDWIDGET_H
 #define WIREWORLDWIDGET_H
 
+#include <QWidget>
+#include <QPainter>
 #include <QKeyEvent>
 #include <QMouseEvent>
-#include <QGLWidget>
+#include <QWheelEvent>
 #include <QTimer>
 #include <thread>
 #include <future>
@@ -29,6 +31,7 @@ protected:
     void mousePressEvent(QMouseEvent *p_qmeEvent);
     void mouseMoveEvent(QMouseEvent *p_qmeEvent);
     void paintEvent(QPaintEvent *);
+    void wheelEvent(QWheelEvent *p_pqweWheelEvent);
 
 private slots:
     void update();

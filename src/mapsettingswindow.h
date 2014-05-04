@@ -2,6 +2,8 @@
 #define MAPSETTINGSWINDOW_H
 
 #include <QMainWindow>
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QSpinBox>
 #include <QLabel>
 #include <QPushButton>

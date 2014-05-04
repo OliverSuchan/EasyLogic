@@ -48,6 +48,7 @@ MapSettingsWindow::MapSettingsWindow(QWidget *parent)
 
     m_pqpbApplyButton = new QPushButton(this);
     m_pqpbApplyButton->setGeometry(20, size().height() - 40, 180, 25);
+    this->move((QApplication::desktop()->width() - this->size().width()) / 2, (QApplication::desktop()->height() - this->size().height()) / 2);
     connect(m_pqpbApplyButton, SIGNAL(clicked()), this, SLOT(applyButtonClickEvent()));
     m_pqpbApplyButton->setText("Anwenden");
 

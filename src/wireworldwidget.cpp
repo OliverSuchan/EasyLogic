@@ -2,15 +2,14 @@
 
 QColor WireWorldWidget::s_rqcColors[] = { QColor(Qt::black), QColor(Qt::yellow), QColor(Qt::blue), QColor(Qt::red) };
 
-Automaton WireWorldWidget::getAutomaton() const
+Automaton &WireWorldWidget::getAutomaton()
 {
     return m_aAutomaton;
 }
 
-void WireWorldWidget::setAutomaton(const Automaton &p_aAutomaton)
+void WireWorldWidget::setAutomaton(Automaton p_aAutomaton)
 {
     m_aAutomaton = p_aAutomaton;
-    this->repaint();
 }
 
 

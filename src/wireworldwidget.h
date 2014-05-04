@@ -40,8 +40,8 @@ private slots:
 public:
     WireWorldWidget(QWidget *p_pqwParent = 0);
     ~WireWorldWidget();
-    Automaton getAutomaton() const;
-    void setAutomaton(const Automaton &p_aAutomaton);
+    Automaton &getAutomaton();
+    void setAutomaton(Automaton p_aAutomaton);
     bool getAutoNextGeneration() const;
     void setAutoNextGeneration(bool p_bAutoNextGeneration);
     void resize(int p_iWidth, int p_iHeight);

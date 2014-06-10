@@ -9,8 +9,15 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QSlider>
+#include <QSpinBox>
+#include <QMenuBar>
+#include <QMenu>
 #include <QtMath>
+#include <QAction>
+#include <QIcon>
+#include <QPixmap>
 #include <iostream>
+#include <limits>
 #include "globals.h"
 #include "wireworldwidget.h"
 
@@ -35,9 +42,19 @@ private:
     QPushButton *m_pqpbSaveButton;
     QPushButton *m_pqpbNextStepButton;
     QPushButton *m_pqpbPreviousStepButton;
+    QSpinBox *m_pqsbStepBox;
     QSlider *m_pqsZoomSlider;
+    QMenuBar *m_pqmbMenuBar;
+    QMenu *m_pqmItemsMenu;
+    QAction *m_pqaEmptyState;
+    QAction *m_pqaConductorState;
+    QAction *m_pqaHeadState;
+    QAction *m_pqaTailState;
     void setupUI();
     void init();
+
+private slots:
+    void itemTriggeredAction();
 };
 
 #endif // MAINWINDOW_H

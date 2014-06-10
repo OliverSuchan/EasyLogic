@@ -1,7 +1,5 @@
 #include "wireworldwidget.h"
 
-QColor WireWorldWidget::s_rqcColors[] = { QColor(Qt::black), QColor(Qt::yellow), QColor(Qt::blue), QColor(Qt::red) };
-
 Automaton &WireWorldWidget::getAutomaton()
 {
     return m_aAutomaton;
@@ -31,6 +29,11 @@ void WireWorldWidget::resize(int p_iWidth, int p_iHeight)
 
     if(m_aAutomaton.getHeight() * Globals::getInstance().m_dCellHeight * Globals::getInstance().m_dZoomFactor != p_iHeight)
         Globals::getInstance().m_dCellHeight = p_iHeight / m_aAutomaton.getHeight() + 1;
+}
+
+void WireWorldWidget::setCurrentState(Globals::State p_sNewState)
+{
+    m_sCurrentState = p_sNewState;
 }
 
 void WireWorldWidget::keyPressEvent(QKeyEvent *p_pqkeEvent)
@@ -78,21 +81,31 @@ void WireWorldWidget::mousePressEvent(QMouseEvent *p_qmeEvent)
         }
         catch(std::exception) {}
     }
+    m_qpOldMousePosition = p_qmeEvent->pos();
 }
 
 void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
 {
-    double iX = p_qmeEvent->windowPos().x() - Globals::getInstance().m_iX;
-    double iY = p_qmeEvent->windowPos().y() - Globals::getInstance().m_iY;
-    double iCellWidth = Globals::getInstance().m_dCellWidth * Globals::getInstance().m_dZoomFactor;
-    double iCellHeight = Globals::getInstance().m_dCellHeight * Globals::getInstance().m_dZoomFactor;
-    int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
-    int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
-    try
+    if(p_qmeEvent->buttons() == Qt::LeftButton)
     {
-        m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
+        double iX = p_qmeEvent->windowPos().x() - Globals::getInstance().m_iX;
+        double iY = p_qmeEvent->windowPos().y() - Globals::getInstance().m_iY;
+        double iCellWidth = Globals::getInstance().m_dCellWidth * Globals::getInstance().m_dZoomFactor;
+        double iCellHeight = Globals::getInstance().m_dCellHeight * Globals::getInstance().m_dZoomFactor;
+        int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
+        int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
+        try
+        {
+            m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
+        }
+        catch(std::exception) {}
     }
-    catch(std::exception) {}
+    else if(p_qmeEvent->buttons() == Qt::MidButton)
+    {
+        Globals::getInstance().m_iX += p_qmeEvent->pos().x() - m_qpOldMousePosition.x();
+        Globals::getInstance().m_iY += p_qmeEvent->pos().y() - m_qpOldMousePosition.y();
+    }
+    m_qpOldMousePosition = p_qmeEvent->pos();
 }
 
 void WireWorldWidget::paintEvent(QPaintEvent *)
@@ -107,7 +120,7 @@ void WireWorldWidget::paintEvent(QPaintEvent *)
     {
         for(int iCounterY = 0; iCounterY < m_aAutomaton.getHeight(); iCounterY++)
         {
-            if(iCounterX * dCellWidth <= this->size().width() || iCounterX * dCellHeight <= this->size().height())
+            if(Globals::getInstance().m_iX + iCounterX * dCellWidth <= this->size().width() || Globals::getInstance().m_iY + iCounterX * dCellHeight <= this->size().height())
             {
                 QColor color = Globals::getInstance().m_rqcColors[m_aAutomaton.getStateAt(iCounterX, iCounterY)];
                 if(color == Globals::getInstance().m_rqcColors[Globals::getInstance().EMPTY])

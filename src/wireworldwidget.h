@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QTimer>
+#include <QPoint>
 #include <thread>
 #include <future>
 #include <mutex>
@@ -25,6 +26,7 @@ private:
     std::mutex m_threadMutex;
     std::atomic<bool> m_bCanUpdate;
     std::atomic<int> m_iFPS;
+    QPoint m_qpOldMousePosition;
 
 protected:
     void keyPressEvent(QKeyEvent *p_pqkeEvent);
@@ -45,7 +47,7 @@ public:
     bool getAutoNextGeneration() const;
     void setAutoNextGeneration(bool p_bAutoNextGeneration);
     void resize(int p_iWidth, int p_iHeight);
-    static QColor s_rqcColors[];
+    void setCurrentState(Globals::State p_sNewState);
 
 };
 

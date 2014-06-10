@@ -3,20 +3,28 @@
 
 #include <QColor>
 
-namespace Globals
+class Globals
 {
-
-    static qreal CELL_WIDTH = 32;
-    static qreal CELL_HEIGHT = 32;
-    static qreal ZoomFactor_X = 1.0;
-    static qreal ZoomFactor_Y = 1.0;
-
-
     enum State {
         EMPTY, CONDUCTOR, HEAD, TAIL
     };
 
-    static const QColor s_rqcColors[] = { QColor(Qt::black), QColor(Qt::yellow), QColor(Qt::blue), QColor(Qt::red) };
-}
+    static Globals &getInstance();
+    int m_dCellWidth;
+    int m_dCellHeight;
+    int m_iX;
+    int m_iY;
+    double m_dZoomFactor;
+
+    QString m_rqstStateNames[4];
+    QColor m_rqcColors[4];
+
+
+private:
+    Globals();
+    Globals(Globals &p_gloRef);
+    ~Globals();
+    Globals &operator=(Globals &p_gloRef);
+};
 
 #endif // GLOBALS_H

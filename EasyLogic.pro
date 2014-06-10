@@ -10,6 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = EasyLogic
 TEMPLATE = app
+
 CONFIG += c++11
 
 SOURCES +=\
@@ -20,6 +21,8 @@ SOURCES +=\
     src/wireworldwidget.cpp \
     src/dataio.cpp \
     src/cellpattern.cpp
+    src/mapsettingswindow.cpp \
+    src/globals.cpp
 
 HEADERS  += \
     src/mainwindow.h \
@@ -29,3 +32,4 @@ HEADERS  += \
     src/wireworldwidget.h \
     src/dataio.h \
     src/cellpattern.h
+    src/mapsettingswindow.h

@@ -26,26 +26,60 @@ void Automaton::setCellState(Globals::State p_sValue, int p_iAbscissa, int p_iOr
     this->setCell(cTempCell, p_iAbscissa, p_iOrdinant);
 }
 
-long Automaton::nextGeneration()
+long Automaton::nextGeneration(long p_lGenerationCount)
 {
-    m_caAuxilliaryArray = m_caCells;
-    for(int iCounterAbscissas = 0; iCounterAbscissas < m_caAuxilliaryArray.size(); iCounterAbscissas++)
+    for(long lGenerations = 0; lGenerations < p_lGenerationCount; lGenerations++)
     {
-        for(int iCounterOrdinants = 0; iCounterOrdinants < m_caAuxilliaryArray.at(iCounterAbscissas).size(); iCounterOrdinants++)
+        m_caAuxilliaryArray = m_caCells;
+        for(int iCounterAbscissas = 0; iCounterAbscissas < m_caAuxilliaryArray.size(); iCounterAbscissas++)
         {
-            Cell cCurrentCell = m_caAuxilliaryArray.at(iCounterAbscissas).at(iCounterOrdinants);
-            if(cCurrentCell.getState() == Globals::CONDUCTOR)
+            for(int iCounterOrdinants = 0; iCounterOrdinants < m_caAuxilliaryArray.at(iCounterAbscissas).size(); iCounterOrdinants++)
             {
-                if(checkCell(iCounterAbscissas, iCounterOrdinants))
+                Cell cCurrentCell = m_caAuxilliaryArray.at(iCounterAbscissas).at(iCounterOrdinants);
+                if(cCurrentCell.getState() == Globals::CONDUCTOR)
                 {
-                    cCurrentCell.nextState();
+                    if(checkCell(iCounterAbscissas, iCounterOrdinants))
+                    {
+                        cCurrentCell.nextState();
+                    }
                 }
+                else cCurrentCell.nextState();
+                m_caCells.at(iCounterAbscissas).at(iCounterOrdinants) = cCurrentCell;
             }
-            else cCurrentCell.nextState();
-            m_caCells.at(iCounterAbscissas).at(iCounterOrdinants) = cCurrentCell;
         }
     }
-    return ++m_lCurrentGen;
+    return m_lCurrentGen += p_lGenerationCount;
+}
+
+long Automaton::previousGeneration(long p_lGenerationCount)
+{
+    if(m_lCurrentGen)
+    {
+        m_caCells = m_caGenerationPurposesArray;
+        for(long lGenerations = 0; lGenerations < m_lCurrentGen - p_lGenerationCount; lGenerations++)
+        {
+            m_caAuxilliaryArray = m_caCells;
+            for(int iCounterAbscissas = 0; iCounterAbscissas < m_caAuxilliaryArray.size(); iCounterAbscissas++)
+            {
+                for(int iCounterOrdinants = 0; iCounterOrdinants < m_caAuxilliaryArray.at(iCounterAbscissas).size(); iCounterOrdinants++)
+                {
+                    Cell cCurrentCell = m_caAuxilliaryArray.at(iCounterAbscissas).at(iCounterOrdinants);
+                    if(cCurrentCell.getState() == Globals::CONDUCTOR)
+                    {
+                        if(checkCell(iCounterAbscissas, iCounterOrdinants))
+                        {
+                            cCurrentCell.nextState();
+                        }
+                    }
+                    else cCurrentCell.nextState();
+                    m_caCells.at(iCounterAbscissas).at(iCounterOrdinants) = cCurrentCell;
+                }
+            }
+        }
+        return m_lCurrentGen -= p_lGenerationCount;
+    }
+    else
+        return m_lCurrentGen;
 }
 
 const Globals::State Automaton::getStateAt(int p_iX, int p_iY) const
@@ -82,3 +116,21 @@ bool Automaton::checkCell(int p_iAbscissa, int p_iOrdinant)
     if(sElectronCounter >= 1 && sElectronCounter <= 2) return true;
     return false;
 }
+long Automaton::getCurrentGen() const
+{
+    return m_lCurrentGen;
+}
+
+void Automaton::setGenerationArray()
+{
+    this->m_caGenerationPurposesArray = m_caCells;
+    m_lCurrentGen = 0;
+}
+
+bool Automaton::canGeneratePreviousGeneration()
+{
+    if(m_caGenerationPurposesArray.size() && m_lCurrentGen)
+        return true;
+    return false;
+}
+

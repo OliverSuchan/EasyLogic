@@ -20,7 +20,7 @@ SOURCES +=\
     src/automaton.cpp \
     src/wireworldwidget.cpp \
     src/dataio.cpp \
-    src/cellpattern.cpp
+    src/cellpattern.cpp \
     src/mapsettingswindow.cpp \
     src/globals.cpp
 
@@ -31,5 +31,5 @@ HEADERS  += \
     src/automaton.h \
     src/wireworldwidget.h \
     src/dataio.h \
-    src/cellpattern.h
+    src/cellpattern.h \
     src/mapsettingswindow.h

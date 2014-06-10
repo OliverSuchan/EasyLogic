@@ -5,6 +5,7 @@
 
 class Globals
 {
+public:
     enum State {
         EMPTY, CONDUCTOR, HEAD, TAIL
     };

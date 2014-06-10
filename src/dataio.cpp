@@ -21,84 +21,126 @@ DataIO &DataIO::getInstance()
 
 DataIO &DataIO::operator<<(const CellPattern &p_cpPattern)
 {
-    try{
-        std::ofstream ofOut(PATH, std::ios_base::binary);
-        std::ifstream ifIn(PATH, std::ios_base::binary);
-        ifIn.seekg(0, ifIn.end);
-        if(!ifIn.tellg()){
-            ofOut.write(p_cpPattern.getName().c_str(), p_cpPattern.getName().size());
-            ofOut.put('\n');
-            long lIndexForNextPos = ofOut.tellp();
-            ofOut.seekp(INDEX_SIZE, ofOut.cur);
-            for(auto aRows : p_cpPattern)
-            {
-                for(Cell cCell : aRows)
-                {
-                    ofOut.put(cCell.getState());
-                }
-            }
-            long lNextWritePos = ofOut.tellp();
-            ofOut.seekp(lIndexForNextPos, ofOut.beg);
-            for(int i = 0; i < INDEX_SIZE; i++)
-            {
-                lNextWritePos >>= 8;
-                ofOut.put(static_cast<char>(lNextWritePos));
-            }
-            ofOut.close();
-            ifIn.close();
-            ifIn.seekg(0); //DEBUG
-            while(!ifIn.eof())std::cout<<ifIn.get()<<std::endl;
+        QDir qdDir(m_qsPath);
+        if(!qdDir.exists()){
+            qdDir.cdUp();
+            qdDir.mkdir(m_qsPath);
         }
-        else{
-
-
+        QFile qfOut(QString(m_qsPath)
+                    + p_cpPattern.getName()
+                    + m_qsFilenameExtendion);
+        if(qfOut.exists()) throw FileAlreadyExistsException();
+        qfOut.open(QIODevice::WriteOnly);
+        qfOut.write(p_cpPattern.getName(), p_cpPattern.getNameQString().length());
+        qfOut.putChar('\n');
+        for(auto aRows : p_cpPattern)
+        {
+            for(Cell cCell : aRows)
+            {
+                qfOut.putChar(cCell.getState());
+            }
+            qfOut.putChar('\n');
         }
-
-    }
-    catch(std::ios_base::failure fail){
-
-    }
+    qfOut.close();
     return *this;
 }
 
 CellPattern DataIO::getPattern(const char *p_sName)
 {
-    try{
-        /*
-    m_fsstream.open(PATH, std::ios_base::in);
-    QString sData = "";
-    while( ! m_fsstream.eof()) sData += m_fsstream.get();
-    QRegExp qrePattern(QString("<p>.*<n>") + QString(p_sName) + QString("<\/n>.*<\/p>"));
-    qrePattern.indexIn(sData);
-    if(qrePattern.captureCount() != 1) std::cerr << "More than one Pattern with same name!" << std::endl;
-    QRegExp qreRows("<r>\\d*<\/r>");
-    qreRows.indexIn(qrePattern.cap(1));
-    CellArray caResult;
-
-    for(int iCount = 1; iCount < qreRows.captureCount(); iCount++){
-        std::vector<Cell> cvResultRows;
-        for(const char *cpPointer = qreRows.cap(iCount).toLocal8Bit().constData(); *cpPointer != '<'; cpPointer++){
-            Cell cResultCell;
-            cResultCell.setState(static_cast<Globals::State>(*cpPointer));
-            cvResultRows.push_back(cResultCell);
+        QDir qdDir(m_qsPath);
+        if(!qdDir.exists()) throw DirectoryNotFoundException();
+        QFile qfIn(m_qsPath + QString(p_sName) + m_qsFilenameExtendion);
+        if(!qfIn.open(QIODevice::ReadOnly)) throw FileNotFoundException();
+        CellPattern cpResultPattern(qfIn.readLine().constData());
+        while(qfIn.canReadLine()){
+            std::vector<Cell> cvResultRow;
+            for(auto aByte : qfIn.readLine()){
+                if(aByte <= Globals::TAIL){
+                    cvResultRow.push_back(Cell(static_cast<Globals::State>(aByte)));
+                }
+            }
+            cpResultPattern.push_back(cvResultRow);
         }
-        caResult.push_back(cvResultRows);
-    }
-    return CellPattern (caResult, std::string(p_sName));
-    }
-    catch(std::ios_base::failure fail){
-        m_fsstream.close();
-        std::cerr<<"Input Exception"<<std::endl;
-    */}
-    catch(...){
-
-        std::cerr<<"Unexpected exception"<<std::endl;
-
-    }
-
+        qfIn.close();
+        return cpResultPattern;
 }
 
-std::vector<CellPattern> DataIO::getAllCellPatterns()
+CellPattern DataIO::getPattern(QString p_qsName)
 {
+    QDir qdDir(m_qsPath);
+    if(!qdDir.exists()) throw DirectoryNotFoundException();
+    QFile qfIn(m_qsPath + p_qsName + m_qsFilenameExtendion);
+    if(!qfIn.open(QIODevice::ReadOnly)) throw FileNotFoundException();
+    CellPattern cpResultPattern(qfIn.readLine().constData());
+    while(qfIn.canReadLine()){
+        std::vector<Cell> cvResultRow;
+        for(auto aByte : qfIn.readLine()){
+            if(aByte <= Globals::TAIL){
+                cvResultRow.push_back(Cell(static_cast<Globals::State>(aByte)));
+            }
+        }
+        cpResultPattern.push_back(cvResultRow);
+    }
+    qfIn.close();
+    return cpResultPattern;
+}
 
+std::vector<const char *> DataIO::getExistingCellPatterns()
+{
+    QDir qdDir(m_qsPath);
+    if(!qdDir.exists()) throw DirectoryNotFoundException();
+    std::vector<const char *> vcResultNames;
+    for(QString name : qdDir.entryList(QStringList(QString("*")+m_qsFilenameExtendion)))
+        vcResultNames.push_back(name.toStdString().c_str());
+    return vcResultNames;
+}
+
+std::vector<QString> DataIO::getExistingCellPatternsQString()
+{
+    QDir qdDir(m_qsPath);
+    if(!qdDir.exists()) throw DirectoryNotFoundException();
+    std::vector<QString> vcResultNames;
+    for(QString qsName : qdDir.entryList(QStringList(QString("*")+m_qsFilenameExtendion)))
+        vcResultNames.push_back(qsName);
+    return vcResultNames;
+}
+
+void DataIO::removePattern(const char *p_sName)
+{
+    QDir qdDir(m_qsPath);
+    if(!qdDir.exists())throw DirectoryNotFoundException();
+    QFile qfFile(m_qsPath + QString(p_sName) + m_qsPath);
+    if(!qfFile.exists())return;
+    qfFile.remove();
+    return;
+}
+
+void DataIO::removePattern(QString p_qsName)
+{
+    QDir qdDir(m_qsPath);
+    if(!qdDir.exists())throw DirectoryNotFoundException();
+    QFile qfFile(m_qsPath + p_qsName + m_qsPath);
+    if(!qfFile.exists())return;
+    qfFile.remove();
+    return;
+}
+
+const char *DataIO::getPath() const
+{
+    return m_qsPath.toStdString().c_str();
+}
+
+QString DataIO::getPathQString() const
+{
+    return m_qsPath;
+}
+
+void DataIO::setPath(const char *p_sPath)
+{
+    m_qsPath = p_sPath;
+}
+
+void DataIO::setPath(QString p_qsPath)
+{
+    m_qsPath = p_qsPath;
 }

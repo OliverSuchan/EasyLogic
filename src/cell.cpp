@@ -4,6 +4,10 @@ Cell::Cell() : m_sCellState(Globals::EMPTY)
 {
 }
 
+Cell::Cell(Globals::State p_sState) : m_sCellState(p_sState)
+{
+}
+
 void Cell::nextState(){
     if(m_sCellState)
     {

@@ -9,6 +9,7 @@ class Cell
 {
 public:
     Cell();
+    Cell(Globals::State p_sState);
     void nextState();
     void setElectron();
     const Globals::State getState() const;

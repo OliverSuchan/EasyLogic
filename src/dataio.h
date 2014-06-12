@@ -13,7 +13,7 @@ private:
     DataIO(DataIO &p_dioRef);
     DataIO &operator=(DataIO &p_dioRef);
     QString m_qsPath;
-    const QString m_qsFilenameExtendion = ".pattern";
+    const QString m_qsFilenameExtension = ".pattern";
 public:
     static DataIO &getInstance();
     DataIO &operator<<(const CellPattern &p_cpPattern);
@@ -27,6 +27,8 @@ public:
     QString getPathQString() const;
     void setPath(const char *p_sPath);
     void setPath(QString p_qsPath);
+    QString getFileExtension();
+
 };
 
 class DirectoryNotFoundException : public std::exception{};

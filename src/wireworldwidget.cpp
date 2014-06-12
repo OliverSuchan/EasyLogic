@@ -36,6 +36,68 @@ void WireWorldWidget::setCurrentState(Globals::State p_sNewState)
     m_sCurrentState = p_sNewState;
 }
 
+QPoint WireWorldWidget::convertMousePosToCellPos()
+{
+    QPoint qpMousePos = mapFromGlobal(QCursor::pos());
+    double iX = qpMousePos.x() - Globals::getInstance().m_iX;
+    double iY = qpMousePos.y() - Globals::getInstance().m_iY;
+    double iCellWidth = Globals::getInstance().m_dCellWidth * Globals::getInstance().m_dZoomFactor;
+    double iCellHeight = Globals::getInstance().m_dCellHeight * Globals::getInstance().m_dZoomFactor;
+    return QPoint(static_cast<int>(iX / iCellWidth), static_cast<int>(iY / iCellHeight));
+}
+
+void WireWorldWidget::insertCellPattern(CellPattern p_cpCellPattern, QPoint p_qpCellPatternPositon)
+{
+    QPoint qpBackup = p_qpCellPatternPositon;
+    for(auto aRows : p_cpCellPattern)
+    {
+        for(Cell cCell : aRows)
+        {
+            m_aAutomaton.setCell(cCell, p_qpCellPatternPositon);
+            p_qpCellPatternPositon.setY(p_qpCellPatternPositon.y() + 1);
+        }
+        p_qpCellPatternPositon.setY(qpBackup.y());
+        p_qpCellPatternPositon.setX(p_qpCellPatternPositon.x() + 1);
+    }
+}
+
+void WireWorldWidget::activateAreaSelection()
+{
+    m_bCanSelectArea.store(true);
+}
+
+void WireWorldWidget::deactivateAreaSelection()
+{
+    m_qrSelectedArea = QRect(0, 0, 0, 0);
+    m_bCanSelectArea.store(false);
+}
+
+CellArray WireWorldWidget::getSelectedArea()
+{
+    CellArray caSelectedCells;
+    caSelectedCells.push_back(std::vector<Cell>());
+    for(int iAbscissa = m_qrSelectedArea.x(); iAbscissa <= m_qrSelectedArea.x() + m_qrSelectedArea.width(); iAbscissa++)
+    {
+        std::vector<Cell> cvCellOrdinants;
+        for(int iOrdinant = m_qrSelectedArea.y(); iOrdinant <=  m_qrSelectedArea.y() + m_qrSelectedArea.height(); iOrdinant++)
+        {
+            cvCellOrdinants.push_back(Cell(m_aAutomaton.getStateAt(iAbscissa, iOrdinant)));
+        }
+        caSelectedCells.push_back(cvCellOrdinants);
+    }
+    return caSelectedCells;
+}
+
+void WireWorldWidget::selectAll()
+{
+    m_qrSelectedArea = QRect(0, 0, m_aAutomaton.getWidth() - 1, m_aAutomaton.getHeight() - 1);
+}
+
+void WireWorldWidget::unselectAll()
+{
+    m_qrSelectedArea = QRect(0, 0, 0, 0);
+}
+
 void WireWorldWidget::keyPressEvent(QKeyEvent *p_pqkeEvent)
 {
     if(p_pqkeEvent->key() >= Qt::Key_0 && p_pqkeEvent->key() <= Qt::Key_3)
@@ -69,34 +131,46 @@ void WireWorldWidget::mousePressEvent(QMouseEvent *p_qmeEvent)
 {
     if(p_qmeEvent->button() == Qt::LeftButton)
     {
-        double iX = p_qmeEvent->windowPos().x() - Globals::getInstance().m_iX;
-        double iY = p_qmeEvent->windowPos().y() - Globals::getInstance().m_iY;
-        double iCellWidth = Globals::getInstance().m_dCellWidth * Globals::getInstance().m_dZoomFactor;
-        double iCellHeight = Globals::getInstance().m_dCellHeight * Globals::getInstance().m_dZoomFactor;
-        int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
-        int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
+        if(m_bCanSelectArea.load())
+        {
+            m_qrSelectedArea = QRect(convertMousePosToCellPos(), QPoint(0, 0));
+            goto task;
+        }
         try
         {
-            m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
+            m_aAutomaton.setCellState(m_sCurrentState, convertMousePosToCellPos());
         }
         catch(std::exception) {}
     }
-    m_qpOldMousePosition = p_qmeEvent->pos();
+    task:
+        m_qpOldMousePosition = p_qmeEvent->pos();
+        emit clicked();
+}
+
+void clicked()
+{
+
 }
 
 void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
 {
     if(p_qmeEvent->buttons() == Qt::LeftButton)
     {
-        double iX = p_qmeEvent->windowPos().x() - Globals::getInstance().m_iX;
-        double iY = p_qmeEvent->windowPos().y() - Globals::getInstance().m_iY;
-        double iCellWidth = Globals::getInstance().m_dCellWidth * Globals::getInstance().m_dZoomFactor;
-        double iCellHeight = Globals::getInstance().m_dCellHeight * Globals::getInstance().m_dZoomFactor;
-        int iCellNumberAbscissa = static_cast<int>(iX / iCellWidth);
-        int iCellNumberOrdinant = static_cast<int>(iY / iCellHeight);
+        if(m_bCanSelectArea.load())
+        {
+            m_qrSelectedArea = QRect(m_qrSelectedArea.topLeft(), convertMousePosToCellPos());
+            if(m_qrSelectedArea.x() < 0) m_qrSelectedArea.setX(0);
+
+            if(m_qrSelectedArea.x() + m_qrSelectedArea.width() > m_aAutomaton.getWidth() - 1) m_qrSelectedArea.setWidth(m_aAutomaton.getWidth() - 1 - m_qrSelectedArea.x());
+
+            if(m_qrSelectedArea.y() < 0) m_qrSelectedArea.setY(0);
+
+            if(m_qrSelectedArea.y() + m_qrSelectedArea.height() > m_aAutomaton.getHeight() - 1) m_qrSelectedArea.setHeight(m_aAutomaton.getHeight() - 1 - m_qrSelectedArea.y());
+            goto task;
+        }
         try
         {
-            m_aAutomaton.setCellState(m_sCurrentState, iCellNumberAbscissa, iCellNumberOrdinant);
+            m_aAutomaton.setCellState(m_sCurrentState, convertMousePosToCellPos());
         }
         catch(std::exception) {}
     }
@@ -105,7 +179,8 @@ void WireWorldWidget::mouseMoveEvent(QMouseEvent *p_qmeEvent)
         Globals::getInstance().m_iX += p_qmeEvent->pos().x() - m_qpOldMousePosition.x();
         Globals::getInstance().m_iY += p_qmeEvent->pos().y() - m_qpOldMousePosition.y();
     }
-    m_qpOldMousePosition = p_qmeEvent->pos();
+    task:
+        m_qpOldMousePosition = p_qmeEvent->pos();
 }
 
 void WireWorldWidget::paintEvent(QPaintEvent *)
@@ -123,6 +198,16 @@ void WireWorldWidget::paintEvent(QPaintEvent *)
             if(Globals::getInstance().m_iX + iCounterX * dCellWidth <= this->size().width() || Globals::getInstance().m_iY + iCounterX * dCellHeight <= this->size().height())
             {
                 QColor color = Globals::getInstance().m_rqcColors[m_aAutomaton.getStateAt(iCounterX, iCounterY)];
+                if(m_bCanSelectArea.load())
+                {
+                    if(iCounterX >= m_qrSelectedArea.x() && iCounterX <= m_qrSelectedArea.x() + m_qrSelectedArea.width() &&
+                            iCounterY >= m_qrSelectedArea.y() && iCounterY <= m_qrSelectedArea.y() + m_qrSelectedArea.height())
+                    {
+                        if(color == Globals::getInstance().m_rqcColors[Globals::getInstance().EMPTY])
+                            color = Qt::gray;
+                        color.setAlpha(125);
+                    }
+                }
                 if(color == Globals::getInstance().m_rqcColors[Globals::getInstance().EMPTY])
                     continue;
                 qpPainter.fillRect(QRectF(Globals::getInstance().m_iX + iCounterX * dCellWidth, Globals::getInstance().m_iY + iCounterY * dCellHeight, dCellWidth, dCellHeight), color);
@@ -145,7 +230,6 @@ void WireWorldWidget::wheelEvent(QWheelEvent *p_pqweWheelEvent)
         Globals::getInstance().m_iY += numSteps;
     }
 }
-
 
 void WireWorldWidget::update()
 {
@@ -176,6 +260,7 @@ WireWorldWidget::WireWorldWidget(QWidget *p_pqwParent)
     setFocusPolicy(Qt::ClickFocus);
     m_bAutoNextGeneration.store(false);
     m_bCanUpdate.store(false);
+    m_bCanSelectArea.store(false);
     m_iFPS.store(0);
     m_sthrUpdateThread = new std::thread(&WireWorldWidget::update, this);
     QTimer *timer = new QTimer(this);

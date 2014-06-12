@@ -1,8 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QMainWindow>
 #include <QWidget>
+#include <QMessageBox>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QEvent>
@@ -16,9 +19,12 @@
 #include <QAction>
 #include <QIcon>
 #include <QPixmap>
+#include <QRect>
 #include <iostream>
 #include <limits>
 #include "globals.h"
+#include "dataio.h"
+#include "savepatternwindow.h"
 #include "wireworldwidget.h"
 
 class MainWindow : public QMainWindow
@@ -46,6 +52,7 @@ private:
     QSlider *m_pqsZoomSlider;
     QMenuBar *m_pqmbMenuBar;
     QMenu *m_pqmItemsMenu;
+    QMenu *m_pqmPatternsMenu;
     QAction *m_pqaEmptyState;
     QAction *m_pqaConductorState;
     QAction *m_pqaHeadState;
@@ -55,6 +62,7 @@ private:
 
 private slots:
     void itemTriggeredAction();
+    void reloadPatternList();
 };
 
 #endif // MAINWINDOW_H

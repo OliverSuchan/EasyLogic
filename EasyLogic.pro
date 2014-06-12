@@ -22,7 +22,8 @@ SOURCES +=\
     src/dataio.cpp \
     src/cellpattern.cpp \
     src/mapsettingswindow.cpp \
-    src/globals.cpp
+    src/globals.cpp \
+    src/savepatternwindow.cpp
 
 HEADERS  += \
     src/mainwindow.h \
@@ -32,4 +33,5 @@ HEADERS  += \
     src/wireworldwidget.h \
     src/dataio.h \
     src/cellpattern.h \
-    src/mapsettingswindow.h
+    src/mapsettingswindow.h \
+    src/savepatternwindow.h

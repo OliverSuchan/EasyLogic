@@ -41,10 +41,16 @@ void MainWindow::paintEvent(QPaintEvent *p_pqpePaintEvent)
 
     if(m_pqpbPreviousStepButton)
         m_pqpbPreviousStepButton->setEnabled(this->m_pwwwWire->getAutomaton().canGeneratePreviousGeneration());
+
+    if(Globals::getInstance().m_dZoomFactor * 100.0 != m_pqsZoomSlider->value())
+        m_pqsZoomSlider->setValue(Globals::getInstance().m_dZoomFactor * 100);
 }
 
 void MainWindow::setupUI()
 {
+    this->resize(600, 600);
+    this->move((QApplication::desktop()->width() - this->size().width()) / 2, (QApplication::desktop()->height() - this->size().height()) / 2);
+
     m_pqpbStartButton = new QPushButton(this);
     m_pqpbStartButton->setText("Start");
     connect(m_pqpbStartButton, &QPushButton::clicked, [=](){
@@ -99,7 +105,7 @@ void MainWindow::setupUI()
     });
 
     m_pqmbMenuBar = new QMenuBar(this);
-    m_pqmItemsMenu = new QMenu(m_pqmbMenuBar);
+    m_pqmItemsMenu = new QMenu("Elemente", m_pqmbMenuBar);
     m_pqmbMenuBar->show();
     this->setMenuBar(m_pqmbMenuBar);
     connect(m_pqmItemsMenu->menuAction(), SIGNAL(triggered()), this, SLOT(itemTriggeredAction()));
@@ -122,8 +128,12 @@ void MainWindow::setupUI()
     connect(m_pqaTailState, &QAction::triggered, [=]() {
         this->m_pwwwWire->setCurrentState(Globals::TAIL);
     });
+
+    m_pqmPatternsMenu = new QMenu("Bausteine", m_pqmbMenuBar);
+    connect(m_pqmPatternsMenu->menuAction(), SIGNAL(hovered()), this, SLOT(reloadPatternList()));
+
     m_pqmbMenuBar->addAction(m_pqmItemsMenu->menuAction());
-    m_pqmItemsMenu->setTitle("Elemente");
+    m_pqmbMenuBar->addAction(m_pqmPatternsMenu->menuAction());
     m_pqmItemsMenu->addAction(m_pqaEmptyState);
     m_pqmItemsMenu->addAction(m_pqaConductorState);
     m_pqmItemsMenu->addAction(m_pqaHeadState);
@@ -165,4 +175,54 @@ void MainWindow::itemTriggeredAction()
     QPixmap qpmTailStateImage(32, 32);
     qpmTailStateImage.fill(Globals::getInstance().m_rqcColors[Globals::TAIL]);
     m_pqaTailState->setIcon(QIcon(qpmTailStateImage));
+}
+
+void MainWindow::reloadPatternList()
+{
+    m_pqmPatternsMenu->clear();
+    QAction *pqaSavePattern = new QAction("Speichern", m_pqmPatternsMenu);
+    connect(pqaSavePattern, &QAction::triggered, [=](){
+        SavePatternWindow *pspwSaveDialog = new SavePatternWindow();
+        pspwSaveDialog->show();
+        connect(pspwSaveDialog->m_pqpbSaveButton, &QPushButton::clicked, [=](){
+            CellArray caSelectedArea = m_pwwwWire->getSelectedArea();
+            try
+            {
+                DataIO::getInstance() << CellPattern(caSelectedArea, pspwSaveDialog->m_pqteNameTextEdit->toPlainText());
+            }
+            catch(FileAlreadyExistsException)
+            {
+                QMessageBox qmbFileExistsMessage(QMessageBox::Information, "Datei existiert bereits", "Der von Ihnen angegebene Pattern-Name existiert bereits.", QMessageBox::Ok, this);
+                qmbFileExistsMessage.exec();
+            }
+            pspwSaveDialog->close();
+        });
+
+        connect(pspwSaveDialog->m_pqcbSelectAllCheckBox, &QCheckBox::stateChanged, [=](int iState){
+            if(iState == Qt::Checked)
+                m_pwwwWire->selectAll();
+            else
+                m_pwwwWire->unselectAll();
+        });
+        m_pwwwWire->activateAreaSelection();
+        connect(pspwSaveDialog, &SavePatternWindow::closed, [=](){
+           m_pwwwWire->deactivateAreaSelection();
+        });
+    });
+
+    m_pqmPatternsMenu->addAction(pqaSavePattern);
+    m_pqmPatternsMenu->addSeparator();
+
+    for(QString qstPatternName : DataIO::getInstance().getExistingCellPatternsQString())
+    {
+        QAction *pqaPattern = new QAction(qstPatternName.replace(DataIO::getInstance().getFileExtension(), "", Qt::CaseInsensitive), m_pqmPatternsMenu);
+        connect(pqaPattern, &QAction::triggered, [=](){
+            connect(m_pwwwWire, &WireWorldWidget::clicked, [=](){
+                    m_pwwwWire->insertCellPattern(DataIO::getInstance().getPattern(qstPatternName), m_pwwwWire->convertMousePosToCellPos());
+                    disconnect(m_pwwwWire, SIGNAL(clicked()), 0, 0);
+                }
+            );
+        });
+        m_pqmPatternsMenu->addAction(pqaPattern);
+    }
 }

@@ -14,6 +14,7 @@
 #include "globals.h"
 #include "automaton.h"
 #include "dataio.h"
+#include "cellpattern.h"
 
 class WireWorldWidget : public QWidget
 {
@@ -28,6 +29,8 @@ private:
     std::atomic<bool> m_bCanUpdate;
     std::atomic<int> m_iFPS;
     QPoint m_qpOldMousePosition;
+    QRect m_qrSelectedArea;
+    std::atomic<bool> m_bCanSelectArea;
 
 protected:
     void keyPressEvent(QKeyEvent *p_pqkeEvent);
@@ -40,6 +43,9 @@ private slots:
     void update();
     void framesPerSecond();
 
+signals:
+    void clicked();
+
 public:
     WireWorldWidget(QWidget *p_pqwParent = 0);
     ~WireWorldWidget();
@@ -49,6 +55,13 @@ public:
     void setAutoNextGeneration(bool p_bAutoNextGeneration);
     void resize(int p_iWidth, int p_iHeight);
     void setCurrentState(Globals::State p_sNewState);
+    QPoint convertMousePosToCellPos();
+    void insertCellPattern(CellPattern p_cpCellPattern, QPoint p_qpCellPatternPositon);
+    void activateAreaSelection();
+    void deactivateAreaSelection();
+    CellArray getSelectedArea();
+    void selectAll();
+    void unselectAll();
 
 };
 

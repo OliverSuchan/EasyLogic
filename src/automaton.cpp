@@ -14,16 +14,30 @@ Automaton::Automaton(int p_iHeight, int p_iWidth) : m_lCurrentGen(0)
     }
 }
 
+void Automaton::setCell(Cell p_cValue, QPoint p_qpCoordinates)
+{
+    setCell(p_cValue, p_qpCoordinates.x(), p_qpCoordinates.y());
+}
+
 void Automaton::setCell(Cell p_cValue, int p_iAbscissa, int p_iOrdinant)
 {
-    m_caCells.at(p_iAbscissa).at(p_iOrdinant) = p_cValue;
+    if(p_iAbscissa >= 0 && p_iAbscissa < getWidth() && p_iOrdinant >= 0 && p_iOrdinant < getHeight())
+        m_caCells.at(p_iAbscissa).at(p_iOrdinant) = p_cValue;
 }
 
 void Automaton::setCellState(Globals::State p_sValue, int p_iAbscissa, int p_iOrdinant)
 {
-    Cell cTempCell = m_caCells.at(p_iAbscissa).at(p_iOrdinant);
-    cTempCell.setState(p_sValue);
-    this->setCell(cTempCell, p_iAbscissa, p_iOrdinant);
+    if(p_iAbscissa >= 0 && p_iAbscissa < getWidth() && p_iOrdinant >= 0 && p_iOrdinant < getHeight())
+    {
+        Cell cTempCell = m_caCells.at(p_iAbscissa).at(p_iOrdinant);
+        cTempCell.setState(p_sValue);
+        this->setCell(cTempCell, p_iAbscissa, p_iOrdinant);
+    }
+}
+
+void Automaton::setCellState(Globals::State p_sValue, QPoint p_qpCellPosition)
+{
+    setCellState(p_sValue, p_qpCellPosition.x(), p_qpCellPosition.y());
 }
 
 long Automaton::nextGeneration(long p_lGenerationCount)

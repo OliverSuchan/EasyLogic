@@ -1,13 +1,13 @@
 #include "dataio.h"
 
-DataIO::DataIO()
+DataIO::DataIO() : m_qsFilenameExtension(".pattern")
 {
     setPath(QDir::currentPath() + "/Patterns/");
 }
 
 DataIO::DataIO(DataIO &p_dioRef)
 {
-    setPath(QDir::currentPath() + "/Patterns/");
+
 }
 
 DataIO &DataIO::operator=(DataIO &p_dioRef)

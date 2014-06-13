@@ -13,7 +13,8 @@ private:
     DataIO(DataIO &p_dioRef);
     DataIO &operator=(DataIO &p_dioRef);
     QString m_qsPath;
-    const QString m_qsFilenameExtension = ".pattern";
+    QString m_qsFilenameExtension;
+
 public:
     static DataIO &getInstance();
     DataIO &operator<<(const CellPattern &p_cpPattern);

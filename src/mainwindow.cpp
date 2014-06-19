@@ -143,7 +143,6 @@ void MainWindow::setupUI()
 
 void MainWindow::init()
 {
-    m_sCurrentState = Globals::EMPTY;
     m_pwwwWire = new WireWorldWidget(this);
     m_pwwwWire->show();
     m_pwwwWire->setFocus();

@@ -1,7 +1,7 @@
 #include "savepatternwindow.h"
 
-SavePatternWindow::SavePatternWindow(QWidget *parent) :
-    QMainWindow(parent, Qt::Tool)
+SavePatternWindow::SavePatternWindow(QWidget *p_qwParent) :
+    QMainWindow(p_qwParent, Qt::Tool)
 {
     this->resize(300, 100);
     this->move((QApplication::desktop()->width() - this->size().width()) / 2, (QApplication::desktop()->height() - this->size().height()) / 2);
@@ -10,9 +10,11 @@ SavePatternWindow::SavePatternWindow(QWidget *parent) :
     m_pqteNameTextEdit = new QTextEdit(this);
     m_pqteNameTextEdit->setGeometry(10, 10, this->size().width() - 20, 25);
     m_pqteNameTextEdit->setPlaceholderText("Pattern-Name");
+    m_pqteNameTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_pqteNameTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     m_pqcbSelectAllCheckBox = new QCheckBox("Alles auswählen", this);
-    m_pqcbSelectAllCheckBox->setGeometry(10, m_pqteNameTextEdit->y() + m_pqteNameTextEdit->size().height(), m_pqcbSelectAllCheckBox->size().width(), m_pqcbSelectAllCheckBox->size().height());
+    m_pqcbSelectAllCheckBox->setGeometry(10, m_pqteNameTextEdit->y() + m_pqteNameTextEdit->size().height(), 280, m_pqcbSelectAllCheckBox->size().height());
 
     m_pqpbSaveButton = new QPushButton("Speichern", this);
     m_pqpbSaveButton->setGeometry(10, m_pqcbSelectAllCheckBox->y() + m_pqcbSelectAllCheckBox->size().height(), 135, 25);

@@ -124,6 +124,7 @@ bool Automaton::checkCell(int p_iAbscissa, int p_iOrdinant)
                 {
                     ++sElectronCounter;
                 }
+                if(sElectronCounter > 2) return false;
             }
         }
     }

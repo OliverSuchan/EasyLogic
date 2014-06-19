@@ -26,11 +26,6 @@ Globals::Globals(Globals &p_gloRef)
 
 }
 
-Globals::~Globals()
-{
-
-}
-
 Globals &Globals::operator=(Globals &p_gloRef)
 {
 

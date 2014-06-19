@@ -10,6 +10,7 @@ MapSettingsWindow::MapSettingsWindow(QWidget *parent)
     m_pqsbWidthSpinBox->setMinimum(1);
     m_pqsbWidthSpinBox->setMaximum(std::numeric_limits<int>::max());
     m_pqsbWidthSpinBox->show();
+    std::cout << std::numeric_limits<int>::max() << std::endl;
 
     m_pqsbHeightSpinBox = new QSpinBox(this);
     m_pqsbHeightSpinBox->setGeometry(125, 20, 75, 25);
